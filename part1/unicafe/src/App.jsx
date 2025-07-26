@@ -6,6 +6,8 @@ const App = () => {
   const [neutral, setNeutral] = useState(0)
   const [bad, setBad] = useState(0)
 
+  const sum = good + neutral + bad;
+
   return (
     <div>
       <h1>give feedback</h1>
@@ -16,6 +18,9 @@ const App = () => {
       <div>good {good}</div>
       <div>neutral {neutral}</div>
       <div>bad {bad}</div>
+      <div>all {good + neutral + bad}</div>
+      <div>average {(good - bad) / sum}</div>
+      <div>positive {good * 100 / sum} %</div>
     </div>
   )
 }
