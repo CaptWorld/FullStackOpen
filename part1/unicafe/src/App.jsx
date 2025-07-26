@@ -1,5 +1,7 @@
 import { useState } from 'react'
 
+const StatisticLine = ({ text, value }) => <div>{text} {value}</div>
+
 const Statistics = ({ good, neutral, bad }) => {
   const sum = good + neutral + bad;
   if (sum === 0) {
@@ -13,12 +15,12 @@ const Statistics = ({ good, neutral, bad }) => {
   return (
     <div>
       <h1>statistics</h1>
-      <div>good {good}</div>
-      <div>neutral {neutral}</div>
-      <div>bad {bad}</div>
-      <div>all {good + neutral + bad}</div>
-      <div>average {(good - bad) / sum}</div>
-      <div>positive {good * 100 / sum} %</div>
+      <StatisticLine text="good" value={good} />
+      <StatisticLine text="neutral" value={neutral} />
+      <StatisticLine text="bad" value={bad} />
+      <StatisticLine text="all" value={good + neutral + bad} />
+      <StatisticLine text="average" value={(good - bad) / sum} />
+      <StatisticLine text="positive" value={`${good * 100 / sum} %`} />
     </div>
   );
 }
