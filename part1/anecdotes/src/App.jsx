@@ -4,6 +4,18 @@ function getRandomInt(max) {
   return Math.floor(Math.random() * max);
 }
 
+const VoteViewer = ({ vote }) => <div>has {vote} votes</div>
+
+const MostVotedAnecdote = ({ anecdotes, votes, indexWithMostVotes }) => {
+  return (
+    <div>
+      <h1>Anecdote with most votes</h1>
+      <div>{anecdotes[indexWithMostVotes]}</div>
+      <VoteViewer vote={votes[indexWithMostVotes]} />
+    </div>
+  )
+}
+
 const App = () => {
   const anecdotes = [
     'If it hurts, do it more often.',
@@ -18,6 +30,7 @@ const App = () => {
 
   const [selected, setSelected] = useState(getRandomInt(anecdotes.length));
   const [votes, setVotes] = useState(new Uint32Array(anecdotes.length));
+  const [indexWithMostVotes, setIndexWithMostVotes] = useState(selected);
 
   console.log("Using anecdote with index", selected);
   console.log("Votes", votes);
@@ -28,12 +41,15 @@ const App = () => {
     const newVotes = [...votes];
     newVotes[selected]++;
     setVotes(newVotes);
+    if (newVotes[selected] > votes[indexWithMostVotes]) {
+      setIndexWithMostVotes(selected);
+    }
   }
 
   return (
     <div>
       <div>{anecdotes[selected]}</div>
-      <div>has {votes[selected]} votes</div>
+      <VoteViewer vote={votes[selected]} />
       <div>
         <button
           onClick={incrementVote}
@@ -46,6 +62,11 @@ const App = () => {
           next anecdote
         </button>
       </div>
+      <MostVotedAnecdote
+        anecdotes={anecdotes}
+        votes={votes}
+        indexWithMostVotes={indexWithMostVotes}
+      />
     </div>
   )
 }
