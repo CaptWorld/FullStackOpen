@@ -6,7 +6,7 @@ const Persons = ({ filter, persons }) => {
                 <div
                     key={person.name}
                 >
-                    {person.name} {person.phone}
+                    {person.name} {person.number}
                 </div>
             )}
         </div>

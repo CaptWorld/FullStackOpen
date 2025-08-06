@@ -3,17 +3,17 @@ import { useState } from "react"
 const PersonForm = ({ persons, setPersons }) => {
 
     const [newName, setNewName] = useState('')
-    const [newPhone, setNewPhone] = useState('')
+    const [newNumber, setNewNumber] = useState('')
     const handleNewPersonCreation = (event) => {
         event.preventDefault()
         if (persons.findIndex(person => person.name === newName) !== -1) {
             window.alert(`${newName} is already added to phonebook`)
-        } else if (persons.findIndex(person => person.phone === newPhone) !== -1) {
-            window.alert(`${newPhone} is already added to phonebook`)
+        } else if (persons.findIndex(person => person.number === newNumber) !== -1) {
+            window.alert(`${newNumber} is already added to phonebook`)
         } else {
-            setPersons(persons.concat({ name: newName, phone: newPhone }))
+            setPersons(persons.concat({ name: newName, number: newNumber }))
             setNewName('')
-            setNewPhone('')
+            setNewNumber('')
         }
     }
 
@@ -24,7 +24,7 @@ const PersonForm = ({ persons, setPersons }) => {
                 />
             </div>
             <div>
-                number: <input value={newPhone} onChange={(event) => setNewPhone(event.target.value)}
+                number: <input value={newNumber} onChange={(event) => setNewNumber(event.target.value)}
                 />
             </div>
             <div>
