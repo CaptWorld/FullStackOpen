@@ -16,23 +16,36 @@ const App = () => {
 
   const setNewPerson = async (name, number) => {
     if (persons.findIndex(person => person.name === name) !== -1) {
-      window.alert(`${name} is already added to phonebook`)
+      alert(`${name} is already added to phonebook`)
       return new Promise((resolve,) => resolve(false))
     } else if (persons.findIndex(person => person.number === number) !== -1) {
-      window.alert(`${number} is already added to phonebook`);
+      alert(`${number} is already added to phonebook`);
       return new Promise((resolve,) => resolve(false))
     } else {
       return phoneService
-        .addPerson({id: persons.length + 1, name, number})
+        .addPerson({ id: `${persons.length + 1}`, name, number })
         .then(newPerson => setPersons(persons.concat(newPerson)))
         .then(() => true)
         .catch(error => {
           console.error(error);
-          window.alert(`Failed to add person. check logs for error`)
+          alert(`Failed to add person. check logs for error`)
           return false
         });
     }
   }
+
+  const handleDelete = (id) => {
+    phoneService
+      .deletePerson(id)
+      .then(deletedPerson => {
+        setPersons(persons.filter(person => person.id !== deletedPerson.id))
+      })
+      .catch((error) => {
+        console.error(error)
+      })
+  }
+
+  const filteredPersons = persons.filter(person => person.name.toLowerCase().includes(filter.toLowerCase()));
 
   return (
     <div>
@@ -47,8 +60,8 @@ const App = () => {
       />
       <h2>Numbers</h2>
       <Persons
-        filter={filter}
-        persons={persons}
+        persons={filteredPersons}
+        handleDelete={handleDelete}
       />
     </div>
   )
