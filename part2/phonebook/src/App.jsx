@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import axios from 'axios'
+import phoneService from './services/phones'
 import Filter from './components/Filter'
 import PersonForm from './components/PersonForm'
 import Persons from './components/Persons'
@@ -9,13 +9,30 @@ const App = () => {
   const [filter, setFilter] = useState('')
 
   useEffect(() => {
-    axios
-      .get('http://localhost:3001/persons')
-      .then(response => {
-        console.log(response)
-        setPersons(response.data)
-      })
+    phoneService
+      .getAll()
+      .then(setPersons)
   }, [])
+
+  const setNewPerson = async (name, number) => {
+    if (persons.findIndex(person => person.name === name) !== -1) {
+      window.alert(`${name} is already added to phonebook`)
+      return new Promise((resolve,) => resolve(false))
+    } else if (persons.findIndex(person => person.number === number) !== -1) {
+      window.alert(`${number} is already added to phonebook`);
+      return new Promise((resolve,) => resolve(false))
+    } else {
+      return phoneService
+        .addPerson({id: persons.length + 1, name, number})
+        .then(newPerson => setPersons(persons.concat(newPerson)))
+        .then(() => true)
+        .catch(error => {
+          console.error(error);
+          window.alert(`Failed to add person. check logs for error`)
+          return false
+        });
+    }
+  }
 
   return (
     <div>
@@ -26,8 +43,7 @@ const App = () => {
       />
       <h2>add a new</h2>
       <PersonForm
-        persons={persons}
-        setPersons={setPersons}
+        setNewPerson={setNewPerson}
       />
       <h2>Numbers</h2>
       <Persons
