@@ -15,23 +15,50 @@ const App = () => {
   }, [])
 
   const setNewPerson = async (name, number) => {
-    if (persons.findIndex(person => person.name === name) !== -1) {
-      alert(`${name} is already added to phonebook`)
-      return new Promise((resolve,) => resolve(false))
-    } else if (persons.findIndex(person => person.number === number) !== -1) {
-      alert(`${number} is already added to phonebook`);
-      return new Promise((resolve,) => resolve(false))
+    const indexOfpersonWithSameName = persons.findIndex(person => person.name === name);
+    if (indexOfpersonWithSameName !== -1) {
+      if (confirm(`${name} is already added to phonebook, replace the old number with new one?`)) {
+        return phoneService
+          .updatePerson({ id: persons[indexOfpersonWithSameName].id, name, number })
+          .then(updatedPerson => setPersons(persons.map(person => person.id === updatedPerson.id ? updatedPerson : person)))
+          .then(() => true)
+          .catch(error => {
+            console.error(error);
+            alert(`Failed to add person. check logs for error`)
+            return false
+          });
+      } else {
+        return new Promise((resolve,) => resolve(false))
+      }
     } else {
-      return phoneService
-        .addPerson({ id: `${persons.length + 1}`, name, number })
-        .then(newPerson => setPersons(persons.concat(newPerson)))
-        .then(() => true)
-        .catch(error => {
-          console.error(error);
-          alert(`Failed to add person. check logs for error`)
-          return false
-        });
+      const indexOfpersonWithSameNumber = persons.findIndex(person => person.number === number);
+      if (indexOfpersonWithSameNumber !== -1) {
+        if (confirm(`${number} is already added to phonebook, replace the old name with new one?`)) {
+          return phoneService
+            .updatePerson({ id: persons[indexOfpersonWithSameNumber].id, name, number })
+            .then(updatedPerson => setPersons(persons.map(person => person.id === updatedPerson.id ? updatedPerson : person)))
+            .then(() => true)
+            .catch(error => {
+              console.error(error);
+              alert(`Failed to add person. check logs for error`)
+              return false
+            });
+        } else {
+          return new Promise((resolve,) => resolve(false))
+        }
+      } else {
+        return phoneService
+          .addPerson({ id: `${persons.length + 1}`, name, number })
+          .then(newPerson => setPersons(persons.concat(newPerson)))
+          .then(() => true)
+          .catch(error => {
+            console.error(error);
+            alert(`Failed to add person. check logs for error`)
+            return false
+          });
+      }
     }
+
   }
 
   const handleDelete = (id) => {
