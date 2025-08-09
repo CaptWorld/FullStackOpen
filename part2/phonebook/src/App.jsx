@@ -3,16 +3,25 @@ import phoneService from './services/phones'
 import Filter from './components/Filter'
 import PersonForm from './components/PersonForm'
 import Persons from './components/Persons'
+import Notification from './components/Notification'
 
 const App = () => {
   const [persons, setPersons] = useState([])
   const [filter, setFilter] = useState('')
+  const [message, setMessage] = useState(null)
+  const [isError, setError] = useState(false)
 
   useEffect(() => {
     phoneService
       .getAll()
       .then(setPersons)
   }, [])
+
+  const notify = (newMessage, isError) => {
+    setMessage(newMessage)
+    setError(isError)
+    setTimeout(() => setMessage(null), 4000)
+  }
 
   const setNewPerson = async (name, number) => {
     const indexOfpersonWithSameName = persons.findIndex(person => person.name === name);
@@ -21,10 +30,11 @@ const App = () => {
         return phoneService
           .updatePerson({ id: persons[indexOfpersonWithSameName].id, name, number })
           .then(updatedPerson => setPersons(persons.map(person => person.id === updatedPerson.id ? updatedPerson : person)))
+          .then(() => notify(`Updated ${number} of ${name}`, false))
           .then(() => true)
           .catch(error => {
             console.error(error);
-            alert(`Failed to add person. check logs for error`)
+            notify(`Failed to update number of ${name} to ${number}. check logs for error`, true)
             return false
           });
       } else {
@@ -37,10 +47,11 @@ const App = () => {
           return phoneService
             .updatePerson({ id: persons[indexOfpersonWithSameNumber].id, name, number })
             .then(updatedPerson => setPersons(persons.map(person => person.id === updatedPerson.id ? updatedPerson : person)))
+            .then(() => notify(`Updated ${name} of ${number}`, false))
             .then(() => true)
             .catch(error => {
               console.error(error);
-              alert(`Failed to add person. check logs for error`)
+              notify(`Failed to update name of ${number} to ${name}. check logs for error`, true)
               return false
             });
         } else {
@@ -50,10 +61,11 @@ const App = () => {
         return phoneService
           .addPerson({ id: `${persons.length + 1}`, name, number })
           .then(newPerson => setPersons(persons.concat(newPerson)))
+          .then(() => notify(`Added ${name} with ${number}`, false))
           .then(() => true)
           .catch(error => {
             console.error(error);
-            alert(`Failed to add person. check logs for error`)
+            notify(`Failed to add person ${name}. check logs for error`)
             return false
           });
       }
@@ -65,10 +77,12 @@ const App = () => {
     phoneService
       .deletePerson(id)
       .then(deletedPerson => {
+        notify(`Deleted ${deletedPerson.name}`, false)
         setPersons(persons.filter(person => person.id !== deletedPerson.id))
       })
       .catch((error) => {
         console.error(error)
+        notify(`Failed to delete person with id ${id}. check logs for error`, true)
       })
   }
 
@@ -77,6 +91,10 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification 
+        message={message}
+        error={isError}
+      />
       <Filter
         filter={filter}
         setFilter={setFilter}
