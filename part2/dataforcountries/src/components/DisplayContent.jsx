@@ -1,6 +1,7 @@
 import DisplayCountry from "./DisplayCountry"
+import DisplayMultipleCountries from "./DisplayMultipleCountries"
 
-const DisplayCountries = ({ countries }) => {
+const DisplayContent = ({ countries }) => {
     if (!countries) {
         return null
     }
@@ -19,17 +20,11 @@ const DisplayCountries = ({ countries }) => {
         )
     } else {
         return (
-            <div>
-                {countries.map(country => (
-                    <div
-                        key={country.cca2}
-                    >
-                        {country.name.common}
-                    </div>
-                ))}
-            </div>
+            <DisplayMultipleCountries
+                countries={countries}
+            />
         )
     }
 }
 
-export default DisplayCountries
+export default DisplayContent

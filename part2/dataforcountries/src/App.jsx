@@ -1,7 +1,7 @@
 
 import { useEffect, useState } from "react";
 import countryService from "./services/countries"
-import DisplayCountries from "./components/DisplayCountries"
+import DisplayContent from "./components/DisplayContent"
 
 const App = () => {
 
@@ -25,7 +25,7 @@ const App = () => {
         value={filter}
         onChange={event => setFilter(event.target.value)}
       />
-      <DisplayCountries
+      <DisplayContent
         countries={countriesToShow}
       />
     </div>
