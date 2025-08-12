@@ -1,0 +1,4 @@
+GET http://localhost:3001/api/persons/1
+
+### request with invalid id
+GET http://localhost:3001/api/persons/-1
