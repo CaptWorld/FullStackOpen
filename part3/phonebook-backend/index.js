@@ -25,6 +25,10 @@ const persons = [
     }
 ]
 
+app.get('/info', (request, respose) => {
+    respose.end(`Phonebook has info for ${persons.length} people\n\n${new Date()}`)
+})
+
 app.get('/api/persons', (request, response) => {
     response.send(persons)
 })
