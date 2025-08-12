@@ -2,7 +2,7 @@ const express = require('express')
 
 const app = express()
 
-const persons = [
+let persons = [
     {
         "id": "1",
         "name": "Arto Hellas",
@@ -26,7 +26,7 @@ const persons = [
 ]
 
 app.get('/info', (request, respose) => {
-    respose.end(`Phonebook has info for ${persons.length} people\n\n${new Date()}`)
+    respose.send(`Phonebook has info for ${persons.length} people <br /><br /> ${new Date()}`)
 })
 
 app.get('/api/persons', (request, response) => {
@@ -44,6 +44,12 @@ app.get('/api/persons/:id', (request, response) => {
             error: `Person with id ${id} not found`
         })
     }
+})
+
+app.delete('/api/persons/:id', (request, response) => {
+    const id = request.params.id;
+    persons = persons.filter(person => person.id !== id)
+    response.status(204).end()
 })
 
 const PORT = 3001
