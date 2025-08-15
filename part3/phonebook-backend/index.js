@@ -1,6 +1,5 @@
 const express = require('express')
 const morgan = require('morgan')
-const cors = require('cors')
 
 const app = express()
 
@@ -12,7 +11,7 @@ const formatter = morgan.compile(':method :url :status :res[content-length] - :r
 
 app.use(morgan(formatter))
 
-app.use(cors())
+app.use(express.static('dist'))
 
 let persons = [
     {
