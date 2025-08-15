@@ -76,9 +76,9 @@ const App = () => {
   const handleDelete = (id) => {
     phoneService
       .deletePerson(id)
-      .then(deletedPerson => {
-        notify(`Deleted ${deletedPerson.name}`, false)
-        setPersons(persons.filter(person => person.id !== deletedPerson.id))
+      .then(() => {
+        notify(`Successfully deleted`, false)
+        setPersons(persons.filter(person => person.id !== id))
       })
       .catch((error) => {
         console.error(error)
