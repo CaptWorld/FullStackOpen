@@ -1,5 +1,6 @@
 const express = require('express')
 const morgan = require('morgan')
+const cors = require('cors')
 
 const app = express()
 
@@ -10,6 +11,8 @@ morgan.token('request-body', (req) => JSON.stringify(req.body))
 const formatter = morgan.compile(':method :url :status :res[content-length] - :response-time ms :request-body')
 
 app.use(morgan(formatter))
+
+app.use(cors())
 
 let persons = [
     {
@@ -74,7 +77,7 @@ const validate = (newPerson) => {
 }
 
 app.post('/api/persons', (request, response) => {
-    const person = {...request.body}
+    const person = { ...request.body }
     const error = validate(person)
     if (error) {
         return response.status(error.status).json({ error: error.message })
