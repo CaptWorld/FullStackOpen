@@ -5,7 +5,11 @@ const app = express()
 
 app.use(express.json())
 
-app.use(morgan('tiny'))
+morgan.token('request-body', (req) => JSON.stringify(req.body))
+
+const formatter = morgan.compile(':method :url :status :res[content-length] - :response-time ms :request-body')
+
+app.use(morgan(formatter))
 
 let persons = [
     {
