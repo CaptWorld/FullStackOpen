@@ -1,8 +1,11 @@
 const express = require('express')
+const morgan = require('morgan')
 
 const app = express()
 
 app.use(express.json())
+
+app.use(morgan('tiny'))
 
 let persons = [
     {
@@ -67,7 +70,7 @@ const validate = (newPerson) => {
 }
 
 app.post('/api/persons', (request, response) => {
-    const person = request.body
+    const person = {...request.body}
     const error = validate(person)
     if (error) {
         return response.status(error.status).json({ error: error.message })
