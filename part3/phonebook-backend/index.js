@@ -16,8 +16,11 @@ app.get('/info', (request, respose) => {
     respose.send(`Phonebook has info for ${persons.length} people <br /><br /> ${new Date()}`)
 })
 
-app.get('/api/persons', (request, response) => {
-    Person.find({}).then(persons => response.send(persons))
+app.get('/api/persons', (request, response, next) => {
+    Person
+        .find({})
+        .then(persons => response.send(persons))
+        .catch(error => next(error))
 })
 
 app.get('/api/persons/:id', (request, response) => {
@@ -65,7 +68,7 @@ const errorHandler = (error, request, response, next) => {
     console.error(error.message)
 
     if (error.name === 'CastError') {
-        return response.status(400).json({error: 'malformatted id'})
+        return response.status(400).json({ error: 'malformatted id' })
     }
 
     next(error)
