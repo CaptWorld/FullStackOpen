@@ -12,8 +12,11 @@ app.use(express.json())
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :request-body'))
 
 
-app.get('/info', (request, respose) => {
-    respose.send(`Phonebook has info for ${persons.length} people <br /><br /> ${new Date()}`)
+app.get('/info', (request, respose, next) => {
+    Person
+        .countDocuments()
+        .then(count => respose.send(`Phonebook has info for ${count} people <br /><br /> ${new Date()}`))
+        .catch(error => next(error))
 })
 
 app.get('/api/persons', (request, response, next) => {
@@ -23,17 +26,19 @@ app.get('/api/persons', (request, response, next) => {
         .catch(error => next(error))
 })
 
-app.get('/api/persons/:id', (request, response) => {
+app.get('/api/persons/:id', (request, response, next) => {
     const id = request.params.id
-    const person = persons.find(person => person.id === id)
-
-    if (person) {
-        response.json(person)
-    } else {
-        response.status(404).json({
-            error: `Person with id ${id} not found`
+    Person
+        .findById(id)
+        .then(personFound => {
+            if (!personFound) {
+                return response.status(404).json({
+                    error: `Person with id ${id} not found`
+                })
+            }
+            response.json(personFound)
         })
-    }
+        .catch(error => next(error))
 })
 
 app.delete('/api/persons/:id', (request, response, next) => {
