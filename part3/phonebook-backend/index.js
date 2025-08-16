@@ -5,15 +5,12 @@ const Person = require('./models/person')
 
 const app = express()
 
-app.use(express.json())
-
 morgan.token('request-body', (req) => JSON.stringify(req.body))
 
-const formatter = morgan.compile(':method :url :status :res[content-length] - :response-time ms :request-body')
-
-app.use(morgan(formatter))
-
 app.use(express.static('dist'))
+app.use(express.json())
+app.use(morgan(':method :url :status :res[content-length] - :response-time ms :request-body'))
+
 
 app.get('/info', (request, respose) => {
     respose.send(`Phonebook has info for ${persons.length} people <br /><br /> ${new Date()}`)
@@ -36,10 +33,12 @@ app.get('/api/persons/:id', (request, response) => {
     }
 })
 
-app.delete('/api/persons/:id', (request, response) => {
+app.delete('/api/persons/:id', (request, response, next) => {
     const id = request.params.id;
-    persons = persons.filter(person => person.id !== id)
-    response.status(204).end()
+    Person
+        .findByIdAndDelete(id)
+        .then(() => response.status(204).end())
+        .catch(error => next(error))
 })
 
 const validate = (name, number) => {
@@ -50,7 +49,7 @@ const validate = (name, number) => {
     }
 }
 
-app.post('/api/persons', (request, response) => {
+app.post('/api/persons', (request, response, next) => {
     const { name, number } = request.body
     const error = validate(name, number)
     if (error) {
@@ -59,7 +58,20 @@ app.post('/api/persons', (request, response) => {
     new Person({ name, number })
         .save()
         .then(savedPerson => response.send(savedPerson))
+        .catch(error => next(error))
 })
+
+const errorHandler = (error, request, response, next) => {
+    console.error(error.message)
+
+    if (error.name === 'CastError') {
+        return response.status(400).json({error: 'malformatted id'})
+    }
+
+    next(error)
+}
+
+app.use(errorHandler)
 
 const PORT = process.env.PORT || 3001
 app.listen(PORT)
