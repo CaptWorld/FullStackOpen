@@ -59,13 +59,13 @@ const App = () => {
         }
       } else {
         return phoneService
-          .addPerson({ id: `${persons.length + 1}`, name, number })
+          .addPerson({ name, number })
           .then(newPerson => setPersons(persons.concat(newPerson)))
           .then(() => notify(`Added ${name} with ${number}`, false))
           .then(() => true)
           .catch(error => {
             console.error(error);
-            notify(`Failed to add person ${name}. check logs for error`)
+            notify(`Failed to add person ${name}. check logs for error`, true)
             return false
           });
       }

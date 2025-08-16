@@ -58,9 +58,35 @@ app.post('/api/persons', (request, response, next) => {
     if (error) {
         return response.status(error.status).json({ error: error.message })
     }
-    new Person({ name, number })
-        .save()
-        .then(savedPerson => response.send(savedPerson))
+    Person
+        .findOne({ name })
+        .then(personFound => {
+            if (personFound) {
+                return response.status(409).json({ error: 'Resource already exists' })
+            }
+
+            return new Person({ name, number })
+                .save()
+                .then(savedPerson => response.send(savedPerson))
+        })
+        .catch(error => next(error))
+})
+
+app.put('/api/persons/:id', (request, response, next) => {
+    const id = request.params.id
+    const { name, number } = request.body
+    const error = validate(name, number)
+    if (error) {
+        return response.status(error.status).json({ error: error.message })
+    }
+    Person
+        .findByIdAndUpdate(id, { name, number })
+        .then(personUpdated => {
+            if (!personUpdated) {
+                return response.status(404).json({ error: `Person with id ${id} not found` })
+            }
+            response.json({ name, number, id })
+        })
         .catch(error => next(error))
 })
 
