@@ -34,7 +34,7 @@ const App = () => {
           .then(() => true)
           .catch(error => {
             console.error(error);
-            notify(`Failed to update number of ${name} to ${number}. check logs for error`, true)
+            notify(`Failed to update number of ${name} to ${number}. Error: ${error.response.data.error || 'please check logs'}`, true)
             return false
           });
       } else {
@@ -51,7 +51,7 @@ const App = () => {
             .then(() => true)
             .catch(error => {
               console.error(error);
-              notify(`Failed to update name of ${number} to ${name}. check logs for error`, true)
+              notify(`Failed to update name of ${number} to ${name}. Error: ${error.response.data.error || 'please check logs'}`, true)
               return false
             });
         } else {
