@@ -65,7 +65,7 @@ const App = () => {
           .then(() => true)
           .catch(error => {
             console.error(error);
-            notify(`Failed to add person ${name}. check logs for error`, true)
+            notify(`Failed to add person ${name}. Error: ${error.response.data.error || 'please check logs'}`, true)
             return false
           });
       }
