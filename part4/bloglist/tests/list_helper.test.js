@@ -43,3 +43,67 @@ describe('total likes', () => {
         assert.strictEqual(listHelper.totalLikes(blogs), 5)
     })
 })
+
+describe('favorite blogs', () => {
+    test('of empty list is undefined', () => {
+        assert.equal(listHelper.favoriteBlog([]), undefined)
+    })
+    test('when list has only one blog is itself', () => {
+        const likes = 99999999
+        const blogs = [
+            {
+                title: "Not My Life",
+                author: "Lokesh",
+                url: "http://www.lokesh.com",
+                likes
+            }
+        ]
+        assert.deepStrictEqual(listHelper.favoriteBlog(blogs), blogs[0])
+    })
+    test('of a bigger list is calculated right', () => {
+        const blogs = [
+            {
+                title: "My Life",
+                author: "Lokesh",
+                url: "http://www.lokesh.com",
+                likes: 2
+            },
+            {
+                title: "Not My Life",
+                author: "Lokesh",
+                url: "http://www.lokesh.com",
+                likes: 3
+            }
+        ]
+        assert.deepStrictEqual(listHelper.favoriteBlog(blogs), blogs[1])
+    })
+    test('of a bigger list with duplicates is the last encountered favorite blog', () => {
+        const blogs = [
+            {
+                title: "My Life",
+                author: "Lokesh",
+                url: "http://www.lokesh.com",
+                likes: 2
+            },
+            {
+                title: "Not My Life",
+                author: "Lokesh",
+                url: "http://www.lokesh.com",
+                likes: 3
+            },
+            {
+                title: "My Life1",
+                author: "Lokesh1",
+                url: "http://www.lokesh1.com",
+                likes: 3
+            },
+            {
+                title: "My Life3",
+                author: "Lokesh3",
+                url: "http://www.lokesh.com",
+                likes: 2
+            }
+        ]
+        assert.deepStrictEqual(listHelper.favoriteBlog(blogs), blogs[2])
+    })
+})
