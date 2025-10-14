@@ -186,3 +186,82 @@ describe('most blogs by an author', () => {
         })
     })
 })
+
+describe('most liked author', () => {
+    test('of empty list is undefined', () => {
+        assert.equal(listHelper.mostLikes([]), undefined)
+    })
+    test('when list has only one blog is its author', () => {
+        const likes = 99999999
+        const blogs = [
+            {
+                title: "Not My Life",
+                author: "Lokesh",
+                url: "http://www.lokesh.com",
+                likes
+            }
+        ]
+        assert.deepStrictEqual(listHelper.mostLikes(blogs), {
+            author: blogs[0].author,
+            likes
+        })
+    })
+    test('of a bigger list is calculated right', () => {
+        const blogs = [
+            {
+                title: "My Life",
+                author: "Lokesh",
+                url: "http://www.lokesh.com",
+                likes: 2
+            },
+            {
+                title: "Not My Life",
+                author: "Lokesh2",
+                url: "http://www.lokesh.com",
+                likes: 3
+            },
+            {
+                title: "My Life",
+                author: "Lokesh",
+                url: "http://www.lokesh.com",
+                likes: 5
+            }
+        ]
+        assert.deepStrictEqual(listHelper.mostLikes(blogs), {
+            author: "Lokesh",
+            likes: 7
+        })
+    })
+    test('of a bigger list with duplicates is the first encountered author with most likes', () => {
+        const blogs = [
+            {
+                title: "My Life",
+                author: "Lokesh1",
+                url: "http://www.lokesh.com",
+                likes: 2
+            },
+            {
+                title: "Not My Life",
+                author: "Lokesh",
+                url: "http://www.lokesh.com",
+                likes: 3
+            },
+            {
+                title: "My Life1",
+                author: "Lokesh1",
+                url: "http://www.lokesh1.com",
+                likes: 3
+            },
+            {
+                title: "My Life3",
+                author: "Lokesh",
+                url: "http://www.lokesh.com",
+                likes: 2
+            }
+        ]
+        assert.deepStrictEqual(listHelper.mostLikes(blogs), {
+            author: "Lokesh1",
+            likes: 5
+        })
+    })
+})
