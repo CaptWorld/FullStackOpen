@@ -59,9 +59,9 @@ test('likes of a new blog is set to zero if absent', async () => {
         .send(newBlog)
         .expect(201)
         .expect('Content-Type', /application\/json/)
-    
+
     const newBlogResponse = response.body
-    
+
     const newBlogInDB = await Blog.findById(newBlogResponse.id)
 
     assert.strictEqual(newBlogInDB.likes, 0)
@@ -109,6 +109,21 @@ test('status code of 204 when blog is deleted', async () => {
     blogsInDB = await testHelper.blogsInDB()
     assert.strictEqual(blogsInDB.length, testHelper.initialBlogs.length - 1)
     assert(!blogsInDB.includes(blog => blog.content === blogToDelete.content))
+})
+
+test('status code of 200 with updated details when blog is updated', async () => {
+    let blogsInDB = await testHelper.blogsInDB()
+    const blogToUpdate = blogsInDB[0];
+
+    const likes = 999
+
+    await api
+        .put(`/api/blogs/${blogToUpdate.id}`)
+        .send({ likes })
+        .expect(200)
+
+    const blogAfterUpdate = await testHelper.findById(blogToUpdate.id)
+    assert.strictEqual(blogAfterUpdate.likes, likes)
 })
 
 after(async () => await mongoose.connection.close())
