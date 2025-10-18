@@ -48,4 +48,23 @@ test('blog can be added', async () => {
     assert.partialDeepStrictEqual(newBlogInDB, newBlog)
 })
 
+test('likes of a new blog is set to zero if absent', async () => {
+    const newBlog = {
+        "title": "Not My Life",
+        "author": "Lokesh",
+        "url": "http://www.lokesh.com",
+    }
+    const response = await api
+        .post('/api/blogs')
+        .send(newBlog)
+        .expect(201)
+        .expect('Content-Type', /application\/json/)
+    
+    const newBlogResponse = response.body
+    
+    const newBlogInDB = await Blog.findById(newBlogResponse.id)
+
+    assert.strictEqual(newBlogInDB.likes, 0)
+})
+
 after(async () => await mongoose.connection.close())
