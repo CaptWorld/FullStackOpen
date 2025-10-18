@@ -24,12 +24,28 @@ test('blogs are returned as JSON', async () => {
 })
 
 test('blogs have id field but not _id as identifier', async () => {
-    const response = await api
-        .get('/api/blogs')
-        .expect(200)
-        .expect('Content-Type', /application\/json/)
+    const response = await api.get('/api/blogs')
     const blogs = response.body
     assert.strictEqual(blogs.filter(blog => blog.hasOwnProperty('id') && !blog.hasOwnProperty('_id')).length, testHelper.initialBlogs.length)
+})
+
+test('blog can be added', async () => {
+    const newBlog = {
+        "title": "Not My Life",
+        "author": "Lokesh",
+        "url": "http://www.lokesh.com",
+        "likes": 99999999
+    }
+    await api
+        .post('/api/blogs')
+        .send(newBlog)
+        .expect(201)
+        .expect('Content-Type', /application\/json/)
+    const allBlogs = await testHelper.blogsInDB()
+    assert.strictEqual(allBlogs.length, testHelper.initialBlogs.length + 1)
+
+    const newBlogInDB = allBlogs[allBlogs.findIndex(blog => blog.url === newBlog.url)]
+    assert.partialDeepStrictEqual(newBlogInDB, newBlog)
 })
 
 after(async () => await mongoose.connection.close())
