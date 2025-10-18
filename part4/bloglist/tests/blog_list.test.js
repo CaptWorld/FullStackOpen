@@ -67,4 +67,37 @@ test('likes of a new blog is set to zero if absent', async () => {
     assert.strictEqual(newBlogInDB.likes, 0)
 })
 
+test('failure when title is absent for new blog', async () => {
+    const newBlog = {
+        "author": "Lokesh",
+        "url": "http://www.lokesh.com",
+    }
+    const response = await api
+        .post('/api/blogs')
+        .send(newBlog)
+        .expect(400)
+})
+
+test('400 error when title is absent', async () => {
+    const newBlog = {
+        "author": "Lokesh",
+        "url": "http://www.lokesh.com",
+    }
+    await api
+        .post('/api/blogs')
+        .send(newBlog)
+        .expect(400)
+})
+
+test('400 error when url is absent', async () => {
+    const newBlog = {
+        "title": "Not My Life",
+        "author": "Lokesh",
+    }
+    await api
+        .post('/api/blogs')
+        .send(newBlog)
+        .expect(400)
+})
+
 after(async () => await mongoose.connection.close())
