@@ -100,4 +100,15 @@ test('400 error when url is absent', async () => {
         .expect(400)
 })
 
+test('status code of 204 when blog is deleted', async () => {
+    let blogsInDB = await testHelper.blogsInDB()
+    const blogToDelete = blogsInDB[0];
+
+    await api.delete(`/api/blogs/${blogToDelete.id}`).expect(204)
+
+    blogsInDB = await testHelper.blogsInDB()
+    assert.strictEqual(blogsInDB.length, testHelper.initialBlogs.length - 1)
+    assert(!blogsInDB.includes(blog => blog.content === blogToDelete.content))
+})
+
 after(async () => await mongoose.connection.close())
