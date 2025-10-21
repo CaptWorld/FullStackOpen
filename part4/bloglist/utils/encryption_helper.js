@@ -14,16 +14,19 @@ const generateJWT = (data) => {
     return jwt.sign(data, config.JWT_SECRET)
 }
 
-const extractAndDecodeJWTToken = (request) => {
+const extractJWTToken = (request) => {
     const auth = request.get('Authorization');
     if (auth && auth.startsWith('Bearer ')) {
-        return jwt.verify(auth.replace('Bearer ', ''), config.JWT_SECRET)
+        return auth.replace('Bearer ', '')
     }
 }
+
+const decodeJWTToken = (token) => jwt.verify(token, config.JWT_SECRET)
 
 module.exports = {
     hash,
     compare,
     generateJWT,
-    extractAndDecodeJWTToken
+    extractJWTToken,
+    decodeJWTToken
 }

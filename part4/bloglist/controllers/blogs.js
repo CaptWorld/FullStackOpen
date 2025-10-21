@@ -9,7 +9,7 @@ blogsRouter.get('/', async (request, response) => {
 })
 
 blogsRouter.post('/', async (request, response) => {
-    const token = encryptionHelper.extractAndDecodeJWTToken(request)
+    const token = encryptionHelper.decodeJWTToken(request.token)
     if (!(token && token.id)) {
         return response.status(401).send({ error: "Invalid token" })
     }
