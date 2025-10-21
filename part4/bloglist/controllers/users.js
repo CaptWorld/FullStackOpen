@@ -1,5 +1,5 @@
 const usersRouter = require('express').Router()
-const bcrypt = require('bcrypt')
+const encryptionHelper = require('../utils/encryption_helper')
 const User = require('../models/user')
 
 usersRouter.get('/', async (request, response) => {
@@ -14,7 +14,7 @@ usersRouter.post('/', async (request, response) => {
         return response.status(400).send({error: 'User validation failed'})
     } 
 
-    const passwordHash = await bcrypt.hash(password, 10)
+    const passwordHash = await encryptionHelper.hash(password, 10)
 
     const user = new User({
         name,

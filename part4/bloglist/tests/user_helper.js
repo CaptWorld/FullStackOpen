@@ -1,5 +1,5 @@
 const User = require('../models/user')
-const bcrypt = require('bcrypt')
+const encryptionHelper = require('../utils/encryption_helper')
 
 const usersInDB = async () => {
     const users = await User.find({})
@@ -7,7 +7,7 @@ const usersInDB = async () => {
 }
 
 const createRootUser = async () => {
-    const passwordHash = await bcrypt.hash('root', 10);
+    const passwordHash = await encryptionHelper.hash('root');
     const rootUser = new User({
         name: 'root',
         username: 'root',
