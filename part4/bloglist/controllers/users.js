@@ -9,6 +9,10 @@ usersRouter.get('/', async (request, response) => {
 usersRouter.post('/', async (request, response) => {
     const { name, username, password } = request.body
 
+    if (!username || username.length < 3 || !password || password.length < 3) {
+        return response.status(400).send({error: 'User validation failed'})
+    } 
+
     const passwordHash = await bcrypt.hash(password, 10)
 
     const user = new User({
