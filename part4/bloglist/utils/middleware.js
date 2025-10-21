@@ -1,3 +1,4 @@
+const User = require('../models/user')
 const encryptionHelper = require('../utils/encryption_helper')
 
 const errorHandler = (error, request, response, next) => {
@@ -16,7 +17,21 @@ const tokenExtractor = (request, response, next) => {
     next()
 }
 
+const userExtractor = async (request, response, next) => {
+    const token = encryptionHelper.decodeJWTToken(request.token)
+    if (!(token && token.id)) {
+        return response.status(401).send({ error: "Invalid token" })
+    }
+    const user = await User.findById(token.id)
+    if (!user) {
+        return response.status(404).send({ error: "User not found" })
+    }
+    request.user = user
+    next()
+}
+
 module.exports = {
     errorHandler,
-    tokenExtractor
+    tokenExtractor,
+    userExtractor
 }
