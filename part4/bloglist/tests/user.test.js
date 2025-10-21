@@ -5,7 +5,6 @@ const supertest = require('supertest')
 const userHelper = require('./user_helper')
 const User = require('../models/user')
 const mongoose = require('mongoose')
-const bcrypt = require('bcrypt')
 
 const api = supertest(app)
 
@@ -13,13 +12,7 @@ describe('when there is an initial root user in db', async () => {
 
     beforeEach(async () => {
         await User.deleteMany({})
-        const passwordHash = await bcrypt.hash('root', 10);
-        const rootUser = new User({
-            name: 'root',
-            username: 'root',
-            passwordHash
-        })
-        await rootUser.save()
+        await userHelper.createRootUser()
     })
 
     test('get api returns proper json', async () => {
