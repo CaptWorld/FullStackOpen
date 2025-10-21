@@ -1,6 +1,7 @@
 const blogsRouter = require('express').Router()
 const Blog = require('../models/blog')
 const User = require('../models/user')
+const encryptionHelper = require('../utils/encryption_helper')
 
 blogsRouter.get('/', async (request, response) => {
     const blogs = await Blog.find({}).populate('user', { name: 1, username: 1 })
@@ -8,12 +9,12 @@ blogsRouter.get('/', async (request, response) => {
 })
 
 blogsRouter.post('/', async (request, response) => {
-    // Use aggregation query to get Random user instead of utilizing findOne query
-    const userIds = await User.aggregate([{ $sample: { size: 1 } }, { $project: { _id: 1 } }])
-    if (!userIds.length) {
-        return response.status(404).send({ error: "No user found to assign this blog to" })
+    const token = encryptionHelper.extractAndDecodeJWTToken(request)
+    if (!(token && token.id)) {
+        return response.status(401).send({ error: "Invalid token" })
     }
-    const user = await User.findById(userIds[0]._id)
+    const userId = token.id
+    const user = await User.findById(userId)
     if (!user) {
         return response.status(404).send({ error: "No user found to assign this blog to" })
     }

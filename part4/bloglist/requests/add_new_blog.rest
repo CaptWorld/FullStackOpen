@@ -1,8 +1,9 @@
 POST http://localhost:3001/api/blogs HTTP/1.1
 content-type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InJvb3QiLCJpZCI6IjY4Zjc5OWUwOGM3N2I1OWM2ZGNhYjc2MyIsImlhdCI6MTc2MTA3MzY0NX0.oXLSB1OW0xbumkBtZFpET9Z2lOrZIWQ3HvlN9Fg20Hg
 
 {
-    "title": "My Life",
+    "title": "My Life Blah",
     "author": "Lokesh",
     "url": "http://www.lokesh.com",
     "likes": 99999999
