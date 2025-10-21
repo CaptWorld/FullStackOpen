@@ -6,17 +6,25 @@ const usersInDB = async () => {
     return users.map(user => user.toJSON())
 }
 
-const createRootUser = async () => {
-    const passwordHash = await encryptionHelper.hash('root');
+const createUser = async (name, username, password) => {
+    const passwordHash = await encryptionHelper.hash(password);
     const rootUser = new User({
-        name: 'root',
-        username: 'root',
+        name,
+        username,
         passwordHash
     })
     return await rootUser.save()
 }
 
+const createRootUser = () => createUser('root', 'root', 'root')
+
+const getUserByBlogId = (username, blogId) => {
+    return User.findOne({ username, blogs: blogId })
+}
+
 module.exports = {
     usersInDB,
-    createRootUser
+    createUser,
+    createRootUser,
+    getUserByBlogId
 }

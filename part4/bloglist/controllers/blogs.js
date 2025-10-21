@@ -1,4 +1,5 @@
 const blogsRouter = require('express').Router()
+const blog = require('../models/blog')
 const Blog = require('../models/blog')
 const User = require('../models/user')
 const encryptionHelper = require('../utils/encryption_helper')
@@ -16,7 +17,7 @@ blogsRouter.post('/', async (request, response) => {
     const userId = token.id
     const user = await User.findById(userId)
     if (!user) {
-        return response.status(404).send({ error: "No user found to assign this blog to" })
+        return response.status(404).send({ error: "User not found" })
     }
     const { title, author, url, likes } = request.body
     const blog = new Blog({
@@ -36,7 +37,25 @@ blogsRouter.post('/', async (request, response) => {
 })
 
 blogsRouter.delete('/:id', async (request, response) => {
-    await Blog.findByIdAndDelete(request.params.id)
+    const token = encryptionHelper.decodeJWTToken(request.token)
+    if (!(token && token.id)) {
+        return response.status(401).send({ error: "Invalid token" })
+    }
+    const userId = token.id
+    const user = await User.findById(userId)
+    if (!user) {
+        return response.status(404).send({ error: "User not found" })
+    }
+    const blogId = request.params.id
+    const blogToDelete = await Blog.findById(request.params.id)
+    if (blogToDelete) {
+        if (blogToDelete.user.toString() !== userId) {
+            return response.status(403).send({ error: "Permission denied" })
+        }
+        await Blog.deleteOne({_id: blogToDelete._id})
+        user.blogs = user.blogs.filter(blog => blog !== blogId)
+        await user.save()
+    }
     response.status(204).end()
 })
 
