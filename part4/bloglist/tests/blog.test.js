@@ -78,6 +78,19 @@ describe('when there is root user initially with few blogs associated with it', 
             const result = await api.delete(`/api/blogs/${blogToDelete.id}`).expect(401)
             assert(result.body.error === 'Invalid token')
         })
+
+        test('blog cannot be updated', async () => {
+            let blogsInDB = await testHelper.blogsInDB()
+            const blogToUpdate = blogsInDB[0];
+
+            const likes = 999
+
+            const result = await api
+                .put(`/api/blogs/${blogToUpdate.id}`)
+                .send({ likes })
+                .expect(401)
+            assert(result.body.error === 'Invalid token')
+        })
     })
 
     describe('scenarios with invalid token in the header', async () => {
@@ -107,6 +120,20 @@ describe('when there is root user initially with few blogs associated with it', 
 
             const result = await api
                 .delete(`/api/blogs/${blogToDelete.id}`)
+                .set('Authorization', 'Bearer blah')
+                .expect(401)
+            assert(result.body.error === 'Invalid token')
+        })
+
+        test('blog cannot be updated', async () => {
+            let blogsInDB = await testHelper.blogsInDB()
+            const blogToUpdate = blogsInDB[0];
+
+            const likes = 999
+
+            const result = await api
+                .put(`/api/blogs/${blogToUpdate.id}`)
+                .send({ likes })
                 .set('Authorization', 'Bearer blah')
                 .expect(401)
             assert(result.body.error === 'Invalid token')
@@ -243,21 +270,54 @@ describe('when there is root user initially with few blogs associated with it', 
                 assert(!await userHelper.getUserByBlogId('root', blogToDelete._id))
             })
         })
-    })
 
-    test('status code of 200 with updated details when blog is updated', async () => {
-        let blogsInDB = await testHelper.blogsInDB()
-        const blogToUpdate = blogsInDB[0];
+        describe('blog updation scenarios', async () => {
 
-        const likes = 999
+            test("error status code of 403 without update when root user's blog is being updated by different user", async () => {
+                await userHelper.createUser('dummy', 'dummy', 'dummy')
+                const token = await generateTokenFor('dummy', 'dummy')
+                let blogsInDB = await testHelper.blogsInDB()
+                const blogToUpdate = blogsInDB[0];
 
-        await api
-            .put(`/api/blogs/${blogToUpdate.id}`)
-            .send({ likes })
-            .expect(200)
+                const likes = 999
 
-        const blogAfterUpdate = await testHelper.findById(blogToUpdate.id)
-        assert.strictEqual(blogAfterUpdate.likes, likes)
+                const result = await api
+                    .put(`/api/blogs/${blogToUpdate.id}`)
+                    .send({ likes })
+                    .set('Authorization', `Bearer ${token}`)
+                    .expect(403)
+
+                assert.strictEqual(result.body.error, 'Permission denied')
+            })
+
+            test("status code of 200 with updated details when root user's blog is being updated by root user", async () => {
+                const token = await generateTokenForRootUser()
+                let blogsInDB = await testHelper.blogsInDB()
+                const blogToUpdate = blogsInDB[0];
+
+                const likes = 999
+
+                await api
+                    .put(`/api/blogs/${blogToUpdate.id}`)
+                    .send({ likes })
+                    .set('Authorization', `Bearer ${token}`)
+                    .expect(200)
+
+                const blogAfterUpdate = await testHelper.findById(blogToUpdate.id)
+                assert.strictEqual(blogAfterUpdate.likes, likes)
+            })
+
+            test("status code of 404 when blog does not exist", async () => {
+                const token = await generateTokenForRootUser()
+                const result = await api
+                    .put('/api/blogs/dummy')
+                    .send({ likes: 999 })
+                    .set('Authorization', `Bearer ${token}`)
+                    .expect(404)
+
+                assert(result.body.error.toLowerCase().includes("not found"))
+            })
+        })
     })
 })
 

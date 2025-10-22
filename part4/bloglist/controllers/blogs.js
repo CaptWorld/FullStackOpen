@@ -36,21 +36,30 @@ blogsRouter.delete('/:id', middleware.userExtractor, async (request, response) =
         if (blogToDelete.user.toString() !== user._id.toString()) {
             return response.status(403).send({ error: "Permission denied" })
         }
-        await Blog.deleteOne({_id: blogToDelete._id})
+        await Blog.deleteOne({ _id: blogToDelete._id })
         user.blogs = user.blogs.filter(blog => blog !== blogId)
         await user.save()
     }
     response.status(204).end()
 })
 
-blogsRouter.put('/:id', async (request, response) => {
+blogsRouter.put('/:id', middleware.userExtractor, async (request, response) => {
+    const user = request.user
     const id = request.params.id
     let { likes } = request.body
     if (typeof likes !== 'number') {
         response.status(400).send({ error: `likes should be a number` })
     }
-    const blogAfterUpdate = await Blog.findByIdAndUpdate(id, { likes }, { returnDocument: 'after' })
-    response.send(blogAfterUpdate)
+    const blogToUpdate = await Blog.findById(id)
+    if (blogToUpdate) {
+        if (blogToUpdate.user.toString() !== user._id.toString()) {
+            return response.status(403).send({ error: "Permission denied" })
+        }
+        const blogAfterUpdate = await Blog.findByIdAndUpdate(blogToUpdate._id, { likes }, { returnDocument: 'after' })
+        response.send(blogAfterUpdate)
+    } else {
+        response.status(404).send({ error: "Blog not found" })
+    }
 })
 
 module.exports = blogsRouter
